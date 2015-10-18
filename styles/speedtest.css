@@ -1,0 +1,16 @@
+table.tablesorter.speedtest th:first-child{width:1%;text-align:left;}
+table.tablesorter.speedtest td:first-child{width:1%;text-align:left;}
+table.tablesorter.speedtest th:nth-child(2){width:3%;text-align:left;}
+table.tablesorter.speedtest td:nth-child(2){width:3%;text-align:left;}
+table.tablesorter.speedtest th:nth-child(3){width:3%;text-align:left;}
+table.tablesorter.speedtest td:nth-child(3){width:3%;text-align:left;}
+table.tablesorter.speedtest th:nth-child(4){width:3%;text-align:left;}
+table.tablesorter.speedtest td:nth-child(4){width:3%;text-align:left;}
+table.tablesorter.speedtest th:nth-child(5){width:5%;text-align:left;}
+table.tablesorter.speedtest td:nth-child(5){width:5%;text-align:left;}
+table.tablesorter.speedtest tr>td+td+td{width:9%;white-space:nowrap;}
+table.tablesorter.speedtest td:last-child{width:96px;padding:0;}
+.no-close .ui-dialog-titlebar {display: none;}
+#dialog {position: absolute;}
+div#preload {display: none;}
+.serverlist {display: none;}

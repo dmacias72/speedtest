@@ -1,2 +1,4 @@
-# speedtest
-speedtest plugin for unRAID
+**Speedtest Command Line Tool**
+
+Interface for testing internet bandwidth using speedtest.net
+
