@@ -8,12 +8,14 @@ $(function(){
            $('.serverlist').hide();
        } 
    });
+   
    if ($('#LIST option:selected').text() == "Manual"){
 		getServerList(Selected);
       $('.serverlist').hide();
       $('#SERVER').show();
    }
-	//create dialog
+
+	//create share image dialog
 	$('#dialog').dialog({
    	autoOpen: false,
     	dialogClass: 'no-close',
@@ -24,7 +26,7 @@ $(function(){
 		}
 	});
 
-	//bind Clear button to clearEvents function
+	//bind Clear button to clearData function
 	$("#btnClearData").bind("click", clearData);
 
 	//toggle all check boxes
@@ -195,7 +197,8 @@ function StoreData() {
 		type: 'POST',
 	   url: "/plugins/speedtest/include/save.php",
   	  	dataType: 'xml',
-  	  	data: {filename: "/boot/config/plugins/speedtest/speedtest.xml", content: tblDataXML},
+  	  	data: {filename: "/boot/config/plugins/speedtest/speedtest.xml",
+  	  	content: tblDataXML},
   	  	error: function() {
   	   	alert("Unknown error. Data could not be written to the file.");
   	  	},
