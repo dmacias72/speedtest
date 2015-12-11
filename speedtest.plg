@@ -2,32 +2,29 @@
 
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "speedtest">
+<!ENTITY repo      "unRAID">
 <!ENTITY author    "dmacias72">
-<!ENTITY version   "2015.10.19">
-<!ENTITY pluginURL "https://raw.githubusercontent.com/&author;/&name;/master/&name;.plg">
-<!ENTITY pkgURL	 "https://raw.githubusercontent.com/&author;/unRAID_6.0/master/">
-<!ENTITY pkgs 	    "/boot/packages/">
-<!ENTITY plugin	 "/boot/config/plugins/&name;">
+<!ENTITY version   "2015.12.10">
 <!ENTITY launch    "Settings/&name;">
+<!ENTITY gitURL    "https://raw.githubusercontent.com/&author;/&repo;/master">
+<!ENTITY pluginURL "&gitURL;/plugins/&name;.plg">
+<!ENTITY pkgURL	 "&gitURL;/source/packages">
+<!ENTITY pkgs 	    "/boot/packages">
+<!ENTITY plugin	 "/boot/config/plugins/&name;">
 <!ENTITY emhttp	 "/usr/local/emhttp/plugins/&name;">
-
 ]>
 
-<PLUGIN  name="&name;"
-         author="&author;"
-         version="&version;"
-         pluginURL="&pluginURL;"
-         pkgURL="&pkgURL;"
-         pkgs="&pkgs;"
-         plugin="&plugin;"
-         launch="&launch;"
-         emhttp="&emhttp;">
->
+<PLUGIN name="&name;" author="&author;" launch="&launch;" version="&version;" pluginURL="&pluginURL;">
+
 <!--
 This Plugin installs speedtest-cli for unRaid 6.1  All dependencies are installed as needed and is controlable from the webgui.
 -->
 
 <CHANGES>
+###2015.12.10
+- add date and time to table
+- add switchbuttons
+- update packages
 ###2015.10.19
 - typos
 ###2015.10.18b
@@ -43,24 +40,31 @@ This Plugin installs speedtest-cli for unRaid 6.1  All dependencies are installe
 <URL>https://raw.githubusercontent.com/eschultz/unraid6-nerdpack/master/packages/python-2.7.9-x86_64-1.txz</URL>
 <MD5>7d5f6d12757c59e5f08ca25bd63aab78</MD5>
 </FILE>
-<FILE Name="&pkgs;/pyOpenSSL-0.15.1-x86_64-1ponce.txz" Run="/sbin/upgradepkg --install-new">
-<URL>&pkgURL;pyOpenSSL-0.15.1-x86_64-1ponce.txz</URL>
-<MD5>5b3c11814f4962ea459cff427f08a4d8</MD5>
+<FILE Name="&pkgs;/pyOpenSSL-0.15.1-x86_64-1_slack.txz" Run="/sbin/upgradepkg --install-new">
+<URL>&pkgURL;/pyOpenSSL-0.15.1-x86_64-1_slack.txz</URL>
+<MD5>b422874df919df6baa10774bd2ddc2cc</MD5>
 </FILE>
-<FILE Name="&pkgs;/pysetuptools-18.0.1-x86_64-1ponce.txz" Run="/sbin/upgradepkg --install-new">
-<URL>&pkgURL;pysetuptools-18.0.1-x86_64-1ponce.txz</URL>
-<MD5>303eb3556ceb4929873ca290174f4280</MD5>
+<FILE Name="&pkgs;/pysetuptools-18.2-x86_64-2_slack.txz" Run="/sbin/upgradepkg --install-new">
+<URL>&pkgURL;/pysetuptools-18.2-x86_64-2_slack.txz</URL>
+<MD5>8cb67f040f55b152042752c85b8c68d6</MD5>
 </FILE>
-<FILE Name="&pkgs;/pip-6.0.8-x86_64-1_slack.txz" Run="/sbin/upgradepkg --install-new">
-<URL>&pkgURL;pip-6.0.8-x86_64-1_slack.txz</URL>
-<MD5>73309767e65e575fa7347b01cad4aa4a</MD5>
+<FILE Name="&pkgs;/pip-7.1.2-x86_64-1_slack.txz" Run="/sbin/upgradepkg --install-new">
+<URL>&pkgURL;/pip-7.1.2-x86_64-1_slack.txz</URL>
+<MD5>1e0a8d9e281cd075c175eca86aea2130</MD5>
 </FILE>
 
 <!--
-git from github as tarball
+The 'plugin' package file.
 -->
-<FILE Name="&plugin;/&name;-&version;.tar.gz">
-<URL>"https://github.com/&author;/&name;/archive/&version;.tar.gz"</URL>
+<FILE Name="&plugin;/&name;-&version;.txz">
+<URL>&gitURL;/archive/&name;-&version;.txz</URL>
+</FILE>
+
+<!--
+The 'plugin' package MD5 hash.
+-->
+<FILE Name="&plugin;/&name;-&version;.md5">
+<URL>&gitURL;/archive/&name;-&version;.md5</URL>
 </FILE>
 
 <!--
@@ -68,15 +72,28 @@ The 'install' script.
 -->
 <FILE Run="/bin/bash">
 <INLINE> 
-if [ ! -d &emhttp; ]; then
-	mkdir -p &emhttp;
+# Verify and install plugin package
+sum1=$(/usr/bin/md5sum &plugin;/&name;-&version;.txz)
+sum2=$(/usr/bin/cat &plugin;/&name;-&version;.md5)
+if [ "${sum1:0:32}" != "${sum2:0:32}" ]; then
+  echo "Wrong 'plugin' package md5 hash."
+  rm -f &plugin;/&name;-&version;.*
+  exit 1
+else
+  upgradepkg --install-new &plugin;/&name;-&version;.txz
 fi
-tar -zxf &plugin;/&name;-&version;.tar.gz --strip=1 -C &emhttp;/
-find &plugin; -type f -iname "*.tar.gz" ! -iname "&name;-&version;.tar.gz" -delete
+
+# Create symlink to xml on flash drive
 ln -sf &plugin;/&name;.xml &emhttp;/&name;.xml
+
+#upgrade pip and install speedtest-cli
 pip install --upgrade pip
 pip install speedtest-cli
 pip install --upgrade speedtest-cli
+
+# Cleaning old source files
+find /boot/config/plugins/&name;/ -type f -iname "&name;*.txz" ! -iname "*&version;*" -delete
+find /boot/config/plugins/&name;/ -type f -iname "&name;*.md5" ! -iname "*&version;*" -delete
 
 echo ""
 echo "-----------------------------------------------------------"
@@ -94,9 +111,9 @@ The 'remove' script.
 -->
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
-rm -rf /usr/local/emhttp/plugins/&name;
-rm -f &plugin;/&name;-&version;.tar.gz
-rm -f  &plugin;/*.txz
+removepkg &plugin;/&name;-&version;.txz
+rm -rf &emhttp;
+rm -f &plugin;/&name;-&version;.*
 
 echo ""
 echo "-----------------------------------------------------------"
